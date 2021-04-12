@@ -1,0 +1,28 @@
+name: release_draft
+
+on:
+  release:
+    types: published
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Post draft release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        URL: ${{ github.event.release.url }}
+        BODY: |
+            ## release date
+            2021-XX-XX
+
+            ## what's in the release
+            - 
+
+      run: |
+        URL=$(echo "$URL" | sed -E 's/\/[0-9]+$//g')
+        BODY=$(echo -e "$BODY" | sed ':a;N;$!ba;s/\n/\\n/g')
+        curl -X POST \
+             -H "Authorization: token ${GITHUB_TOKEN}" \
+             -d "{\"tag_name\": \"\", \"name\": \"v0.X.X\", \"draft\": true, \"body\": \"${BODY}\"}" \
+             $URL
